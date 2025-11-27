@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sys Pão - Sistema de Gestão</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    🥖 Sys Pão - Sistema de Gestão
+  </header>
+
+  <!-- Tela de Login -->
+  <div id="loginScreen" class="login-form">
+    <h2>🔐 Acesso ao Sistema</h2>
+    <div class="login-info-msg">
+      <strong>📚 USO PARA FINS DIDÁTICOS<br>
+<br>
+CETEP Recôncavo Santo Antônio de Jesus<br>
+Curso: Téc. em Administração - 3º Noturno<br>
+Professora: Luana Lemos<br>
+Disciplina: SIG<br>
+Equipe: Crislane, Raissa, Ketlhen, Leandro</strong><br>
+      
+    </div>
+    <div class="form-group">
+      <label for="username">👤 Usuário</label>
+      <input type="text" id="username" autocomplete="username" placeholder="Digite: admin" onkeydown="loginComEnter(event)">
+    </div>
+    <div class="form-group">
+      <label for="password">🔑 Senha</label>
+      <input type="password" id="password" autocomplete="current-password" placeholder="Digite: admin" onkeydown="loginComEnter(event)">
+    </div>
+    <button onclick="login()">Entrar no Sistema</button>
+    <div id="loginError" class="notification error hidden"></div>
+  </div>
+
+  <!-- Sistema Principal -->
+  <main id="mainScreen" class="hidden">
+
+    <!-- MENU HAMBURGUER -->
+    <div class="menu-hamburger" id="hamburgerMenuContainer" style="display:none;">
+      <button class="hamburger" id="btnHamburger" aria-label="Abrir menu" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <span style="font-size:1.1em;color:#7a3e1f;font-weight:bold;">☰ Menu de Navegação</span>
+      <button onclick="logout()" style="margin-left:auto;background:linear-gradient(135deg, #ca5507 0%, #9a4005 100%);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;box-shadow: 0 3px 10px rgba(202, 85, 7, 0.3);">🚪 Sair</button>
+    </div>
+
+    <!-- Menu overlay flutuante -->
+    <div class="menu-options" id="menuOptions">
+      <div class="menu-box">
+        <h3>📋 Navegação</h3>
+        <button onclick="routeMenu('dashboard')" id="menuDashBtn" class="active">🏠 Dashboard</button>
+        <button onclick="routeMenu('produtos')" id="menuProBtn">📦 Estoque</button>
+        <button onclick="routeMenu('vendas')" id="menuVenBtn">💰 Vendas</button>
+        <button onclick="routeMenu('compras')" id="menuComBtn">🛒 Compras</button>
+        <button onclick="routeMenu('fornecedores')" id="menuForBtn">🏢 Fornecedores</button>
+        <button onclick="routeMenu('clientes')" id="menuCliBtn">👥 Clientes</button>
+        <button onclick="routeMenu('relatorios')" id="menuRelBtn">📊 Relatórios</button>
+        <button onclick="routeMenu('usuarios')" id="menuUsuBtn">👤 Usuários</button>
+        <button onclick="routeMenu('informacoes')" id="menuInfoBtn">ℹ️ Informações</button>
+        <button class="close-menu" onclick="toggleMenu()">✖️ Fechar Menu</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section id="secDashboard">
+      <h2>🏠 Dashboard</h2>
+      <div class="notification">
+        <b>💡 Dica:</b> Use o menu <b>☰</b> no topo para acessar todas as funcionalidades do sistema: controle de estoque, registro de vendas e geração de relatórios em PDF.
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <h3>🛒 Última Compra</h3>
+          <div class="stat-number" id="totalCompras">R$ 0,00</div>
+          <div class="stat-label">Total em Compras</div>
+          <div id="ultimaCompra">
+            <!-- Última compra será exibida aqui -->
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <h3>📈 Estatísticas de Vendas</h3>
+          <div class="stat-number" id="totalVendas">R$ 0,00</div>
+          <div class="stat-label">Total em Vendas</div>
+          <div class="stat-number" id="totalProdutosVendidos">0</div>
+          <div class="stat-label">Produtos Vendidos</div>
+        </div>
+        
+        <div class="dashboard-card">
+          <h3>📦 Situação do Estoque</h3>
+          <div class="stat-number" id="totalItensEstoque">0</div>
+          <div class="stat-label">Itens em Estoque</div>
+          <div class="stat-number" id="produtosBaixoEstoque">0</div>
+          <div class="stat-label">Produtos com Estoque Baixo</div>
+        </div>
+        
+        <div class="dashboard-card">
+          <h3>📊 Produtos Mais Vendidos</h3>
+          <div class="chart-container" id="chartProdutosVendidos">
+            <!-- Produtos mais vendidos serão exibidos aqui -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTOQUE/PRODUTOS -->
+    <section id="secProdutos" class="hidden">
+      <h2>📦 Estoque de Insumos e Produtos</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-lista" onclick="toggleListaEstoque()" id="btnVerLista">📋 Ver Lista</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaEstoque', 'Estoque_SysPao.pdf')">📄 Exportar PDF</button>
+      </div>
+
+      <div id="listaEstoqueContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroEstoque" placeholder="🔍 Filtrar produtos..." oninput="filtrarEstoque()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaEstoque">
+            <thead>
+              <tr>
+                <th data-sort="nome">Produto/Insumo</th>
+                <th data-sort="tipo">Tipo</th>
+                <th data-sort="qtd">Quantidade</th>
+                <th data-sort="unidade">Unidade</th>
+                <th data-sort="preco">Preço (R$)</th>
+                <th data-sort="validade">Validade</th>
+                <th data-sort="fornecedor">Fornecedor</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="estoqueBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>➕ Adicionar ou Ajustar Insumo/Produto</summary>
+        <form class="form-section" onsubmit="adicionarEstoque(event)" id="formEstoque">
+          <input type="hidden" id="prodIndex" value="-1">
+          <div class="form-grid">
+            <div class="form-grid-full">
+              <label>Nome do Produto/Insumo:</label>
+              <input required id="prodNome" placeholder="Ex: Pão Francês">
+            </div>
+            <div>
+              <label>Tipo:</label>
+              <select id="prodTipo">
+                <option value="Produto">Produto</option>
+                <option value="Insumo">Insumo</option>
+              </select>
+            </div>
+            <div>
+              <label>Quantidade:</label>
+              <input required type="number" min="0" step="0.01" id="prodQtd" placeholder="0">
+            </div>
+            <div>
+              <label>Unidade:</label>
+              <select id="prodUnidade">
+                <option value="un">un (unidade)</option>
+                <option value="kg">kg (quilograma)</option>
+                <option value="g">g (grama)</option>
+                <option value="litro">litro</option>
+                <option value="ml">ml (mililitro)</option>
+              </select>
+            </div>
+            <div>
+              <label>Preço (R$):</label>
+              <input type="number" step="0.01" min="0" id="prodPreco" placeholder="0.00">
+            </div>
+            <div>
+              <label>Validade:</label>
+              <input type="date" id="prodValidade">
+            </div>
+            <div>
+              <label>Fornecedor:</label>
+              <div class="autocomplete">
+                <div class="input-with-button">
+                  <input id="prodFornecedor" placeholder="Digite o nome do fornecedor" 
+                         oninput="filtrarFornecedores(this.value, 'prodFornecedor')"
+                         onkeydown="verificarEnterFornecedor(event, 'prodFornecedor')">
+                  <button type="button" class="add-button" onclick="abrirModalFornecedor('prodFornecedor')">+</button>
+                </div>
+                <div id="autocomplete-prodFornecedor" class="autocomplete-items"></div>
+              </div>
+              <div id="erro-prodFornecedor" class="error hidden" style="margin-top:5px;"></div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" id="btnSalvarEstoque">💾 Salvar</button>
+            <button type="button" class="btn-limpar" onclick="limparFormEstoque()">🗑️ Limpar</button>
+            <button type="button" class="btn-limpar" onclick="cancelarEdicaoEstoque()" id="btnCancelarEdicao" style="display:none;">❌ Cancelar</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <!-- VENDAS -->
+    <section id="secVendas" class="hidden">
+      <h2>💰 Registro de Vendas</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-lista" onclick="toggleListaVendas()" id="btnVerListaVendas">📋 Ver Lista</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaVendas', 'Relatorio_Vendas.pdf')">📄 Exportar PDF</button>
+      </div>
+
+      <div id="listaVendasContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroVendas" placeholder="🔍 Filtrar vendas..." oninput="filtrarVendas()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaVendas">
+            <thead>
+              <tr>
+                <th data-sort="data">Data</th>
+                <th data-sort="produto">Produto</th>
+                <th data-sort="qtd">Quantidade</th>
+                <th data-sort="valor">Valor (R$)</th>
+                <th data-sort="hora">Horário</th>
+                <th data-sort="cliente">Cliente</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="vendasBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>➕ Registrar Nova Venda</summary>
+        <form class="form-section" onsubmit="registrarVenda(event)" id="formVenda">
+          <div class="form-grid">
+            <div class="form-grid-full">
+              <label>Produto Vendido:</label>
+              <select id="vendaProduto" required onchange="atualizarPrecoVenda()">
+              </select>
+            </div>
+            <div>
+              <label>Quantidade:</label>
+              <input type="number" min="1" id="vendaQtd" required value="1" onchange="atualizarPrecoVenda()">
+            </div>
+            <div>
+              <label>Preço Unitário (R$):</label>
+              <input type="number" step="0.01" id="vendaPrecoUnitario" required placeholder="0.00" onchange="calcularValorTotalVenda()">
+            </div>
+            <div>
+              <label>Valor Total (R$):</label>
+              <input type="number" step="0.01" id="vendaValor" required placeholder="0.00" readonly>
+            </div>
+            <div>
+              <label>Cliente:</label>
+              <div class="autocomplete">
+                <div class="input-with-button">
+                  <input id="vendaCliente" placeholder="Digite o nome do cliente" 
+                         oninput="filtrarClientes(this.value, 'vendaCliente')"
+                         onkeydown="verificarEnterCliente(event, 'vendaCliente')">
+                  <button type="button" class="add-button" onclick="abrirModalCliente('vendaCliente')">+</button>
+                </div>
+                <div id="autocomplete-vendaCliente" class="autocomplete-items"></div>
+              </div>
+              <div id="erro-vendaCliente" class="error hidden" style="margin-top:5px;"></div>
+            </div>
+            <div>
+              <label>Data da Venda:</label>
+              <input type="date" id="vendaData" required>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit">✅ Registrar Venda</button>
+            <button type="button" class="btn-limpar" onclick="limparFormVenda()">🗑️ Limpar</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <!-- COMPRAS -->
+    <section id="secCompras" class="hidden">
+      <h2>🛒 Registro de Compras</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-lista" onclick="toggleListaCompras()" id="btnVerListaCompras">📋 Ver Lista</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaCompras', 'Relatorio_Compras.pdf')">📄 Exportar PDF</button>
+      </div>
+
+      <div id="listaComprasContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroCompras" placeholder="🔍 Filtrar compras..." oninput="filtrarCompras()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaCompras">
+            <thead>
+              <tr>
+                <th data-sort="data">Data</th>
+                <th data-sort="produto">Produto/Insumo</th>
+                <th data-sort="qtd">Quantidade</th>
+                <th data-sort="valorUnitario">Valor Unitário (R$)</th>
+                <th data-sort="valorTotal">Valor Total (R$)</th>
+                <th data-sort="fornecedor">Fornecedor</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="comprasBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>➕ Registrar Nova Compra</summary>
+        <form class="form-section" onsubmit="registrarCompra(event)" id="formCompra">
+          <div class="form-grid">
+            <div class="form-grid-full">
+              <label>Produto/Insumo:</label>
+              <input required id="compraProduto" placeholder="Ex: Farinha de Trigo" onchange="atualizarPrecoCompra()">
+            </div>
+            <div>
+              <label>Quantidade:</label>
+              <input type="number" min="1" id="compraQtd" required value="1" onchange="calcularValorTotalCompra()">
+            </div>
+            <div>
+              <label>Valor Unitário (R$):</label>
+              <input type="number" step="0.01" id="compraValorUnitario" required placeholder="0.00" onchange="calcularValorTotalCompra()">
+            </div>
+            <div>
+              <label>Valor Total (R$):</label>
+              <input type="number" step="0.01" id="compraValorTotal" required placeholder="0.00" readonly>
+            </div>
+            <div>
+              <label>Fornecedor:</label>
+              <div class="autocomplete">
+                <div class="input-with-button">
+                  <input id="compraFornecedor" placeholder="Digite o nome do fornecedor" 
+                         oninput="filtrarFornecedores(this.value, 'compraFornecedor')"
+                         onkeydown="verificarEnterFornecedor(event, 'compraFornecedor')">
+                  <button type="button" class="add-button" onclick="abrirModalFornecedor('compraFornecedor')">+</button>
+                </div>
+                <div id="autocomplete-compraFornecedor" class="autocomplete-items"></div>
+              </div>
+              <div id="erro-compraFornecedor" class="error hidden" style="margin-top:5px;"></div>
+            </div>
+            <div>
+              <label>Data da Compra:</label>
+              <input type="date" id="compraData" required>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit">✅ Registrar Compra</button>
+            <button type="button" class="btn-limpar" onclick="limparFormCompra()">🗑️ Limpar</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <!-- FORNECEDORES -->
+    <section id="secFornecedores" class="hidden">
+      <h2>🏢 Cadastro de Fornecedores</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-lista" onclick="toggleListaFornecedores()" id="btnVerListaFornecedores">📋 Ver Lista</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaFornecedores', 'Fornecedores_SysPao.pdf')">📄 Exportar PDF</button>
+      </div>
+
+      <div id="listaFornecedoresContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroFornecedores" placeholder="🔍 Filtrar fornecedores..." oninput="filtrarFornecedores()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaFornecedores">
+            <thead>
+              <tr>
+                <th data-sort="nome">Nome</th>
+                <th data-sort="cnpj">CNPJ</th>
+                <th data-sort="telefone">Telefone</th>
+                <th data-sort="email">Email</th>
+                <th data-sort="endereco">Endereço</th>
+                <th data-sort="produtos">Produtos Fornecidos</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="fornecedoresBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>➕ Adicionar Fornecedor</summary>
+        <form class="form-section" onsubmit="adicionarFornecedor(event)" id="formFornecedor">
+          <input type="hidden" id="fornecedorIndex" value="-1">
+          <div class="form-grid">
+            <div>
+              <label>Nome do Fornecedor:</label>
+              <input required id="fornecedorNome" placeholder="Ex: TrigoTop">
+            </div>
+            <div>
+              <label>CNPJ:</label>
+              <input id="fornecedorCnpj" placeholder="00.000.000/0000-00">
+            </div>
+            <div>
+              <label>Telefone:</label>
+              <input id="fornecedorTelefone" placeholder="(71) 99999-9999">
+            </div>
+            <div>
+              <label>Email:</label>
+              <input type="email" id="fornecedorEmail" placeholder="exemplo@email.com">
+            </div>
+            <div class="form-grid-full">
+              <label>Endereço:</label>
+              <input id="fornecedorEndereco" placeholder="Rua, Número, Bairro, Cidade">
+            </div>
+            <div class="form-grid-full">
+              <label>Produtos Fornecidos:</label>
+              <input id="fornecedorProdutos" placeholder="Farinha, Açúcar, Fermento">
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" id="btnSalvarFornecedor">💾 Salvar Fornecedor</button>
+            <button type="button" class="btn-limpar" onclick="limparFormFornecedor()">🗑️ Limpar</button>
+            <button type="button" class="btn-limpar" onclick="cancelarEdicaoFornecedor()" id="btnCancelarEdicaoFornecedor" style="display:none;">❌ Cancelar</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="secClientes" class="hidden">
+      <h2>👥 Cadastro de Clientes</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-lista" onclick="toggleListaClientes()" id="btnVerListaClientes">📋 Ver Lista</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaClientes', 'Clientes_SysPao.pdf')">📄 Exportar PDF</button>
+      </div>
+
+      <div id="listaClientesContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroClientes" placeholder="🔍 Filtrar clientes..." oninput="filtrarClientes()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaClientes">
+            <thead>
+              <tr>
+                <th data-sort="nome">Nome</th>
+                <th data-sort="cpf">CPF</th>
+                <th data-sort="telefone">Telefone</th>
+                <th data-sort="endereco">Endereço</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="clientesBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>➕ Adicionar Cliente</summary>
+        <form class="form-section" onsubmit="adicionarCliente(event)" id="formCliente">
+          <input type="hidden" id="clienteIndex" value="-1">
+          <div class="form-grid">
+            <div>
+              <label>Nome do Cliente:</label>
+              <input required id="clienteNome" placeholder="Ex: João Silva">
+            </div>
+            <div>
+              <label>CPF:</label>
+              <input id="clienteCpf" placeholder="000.000.000-00">
+            </div>
+            <div>
+              <label>Telefone:</label>
+              <input id="clienteTelefone" placeholder="(71) 99999-9999">
+            </div>
+            <div class="form-grid-full">
+              <label>Endereço:</label>
+              <input id="clienteEndereco" placeholder="Rua, Número, Bairro, Cidade">
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" id="btnSalvarCliente">💾 Salvar Cliente</button>
+            <button type="button" class="btn-limpar" onclick="limparFormCliente()">🗑️ Limpar</button>
+            <button type="button" class="btn-limpar" onclick="cancelarEdicaoCliente()" id="btnCancelarEdicaoCliente" style="display:none;">❌ Cancelar</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <!-- RELATÓRIOS -->
+    <section id="secRelatorios" class="hidden">
+      <h2>📊 Relatórios Gerenciais</h2>
+      
+      <div class="export-buttons">
+        <button class="btn-lista" onclick="toggleListaRelatorios()" id="btnVerListaRelatorios">📋 Ver Lista</button>
+        <button class="export-btn" onclick="exportRelatorioPDF()">📄 Exportar PDF</button>
+        <button class="export-btn" onclick="exportRelatorioExcel()" style="background:linear-gradient(135deg, #217346 0%, #1e5e3b 100%);">📊 Exportar Excel</button>
+        <button class="export-btn" onclick="salvarRelatorioAtual()" style="background:linear-gradient(135deg, #17a2b8 0%, #138496 100%);">💾 Salvar Relatório</button>
+      </div>
+
+      <div id="listaRelatoriosContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroRelatorios" placeholder="🔍 Filtrar relatórios..." oninput="filtrarRelatorios()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaRelatorios">
+            <thead>
+              <tr>
+                <th data-sort="tipo">Tipo</th>
+                <th data-sort="dataCriacao">Data de Criação</th>
+                <th data-sort="descricao">Descrição</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="relatoriosBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>🔍 Gerar Relatório</summary>
+        <div class="filters">
+          <h3 style="margin-top:0;">🔍 Filtros de Pesquisa</h3>
+          <div class="filters-grid">
+            <div class="filter-item">
+              <label for="relTipo">Tipo de Relatório:</label>
+              <select id="relTipo" onchange="atualizarRelatorio()">
+                <option value="vendas">💰 Vendas</option>
+                <option value="estoque">📦 Estoque</option>
+                <option value="compras">🛒 Compras</option>
+                <option value="fornecedores">🏢 Fornecedores</option>
+                <option value="clientes">👥 Clientes</option>
+                <option value="lucro">💵 Lucro/Prejuízo</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label for="filtroProduto">Produto/Insumo:</label>
+              <select id="filtroProduto" onchange="atualizarRelatorio()">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label for="filtroInicio">Data Início:</label>
+              <input type="date" id="filtroInicio" onchange="atualizarRelatorio()">
+            </div>
+            <div class="filter-item">
+              <label for="filtroFim">Data Fim:</label>
+              <input type="date" id="filtroFim" onchange="atualizarRelatorio()">
+            </div>
+            <div class="filter-item">
+              <label for="filtroFornecedor">Fornecedor:</label>
+              <select id="filtroFornecedor" onchange="atualizarRelatorio()">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label for="filtroCliente">Cliente:</label>
+              <select id="filtroCliente" onchange="atualizarRelatorio()">
+                <option value="">Todos</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="button" onclick="atualizarRelatorio()">🔄 Gerar Relatório</button>
+            <button type="button" class="btn-limpar" onclick="limparFiltrosRelatorio()">🗑️ Limpar</button>
+          </div>
+        </div>
+        <div id="relatorioContent" style="margin-top:25px;"></div>
+      </details>
+    </section>
+
+    <!-- USUÁRIOS -->
+    <section id="secUsuarios" class="hidden">
+      <h2>👤 Gerenciamento de Usuários</h2>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn-lista" onclick="toggleListaUsuarios()" id="btnVerListaUsuarios">📋 Ver Lista</button>
+      </div>
+
+      <div id="listaUsuariosContainer" class="hidden">
+        <div class="search-filter">
+          <input type="text" id="filtroUsuarios" placeholder="🔍 Filtrar usuários..." oninput="filtrarUsuarios()">
+        </div>
+        <div class="table-container">
+          <table id="tabelaUsuarios">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Usuário</th>
+                <th>Tipo</th>
+                <th>Data de Cadastro</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usuariosBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>➕ Adicionar Novo Usuário</summary>
+        <form class="form-section" onsubmit="adicionarUsuario(event)" id="formUsuario">
+          <input type="hidden" id="usuarioIndex" value="-1">
+          <input type="hidden" id="usuarioFotoBase64" value="">
+          
+          <div class="user-photo-container">
+            <img id="usuarioFotoPreview" class="user-photo-preview" src="" style="display:none;" onclick="visualizarFoto(this.src)">
+            <div id="semFotoTexto" style="text-align: center; color: #666; margin-bottom: 10px;">📷 Sem foto</div>
+            <div class="photo-buttons">
+              <button type="button" class="photo-btn" onclick="tirarFoto()">📸 Tirar Foto</button>
+              <button type="button" class="photo-btn" onclick="carregarFoto()">🖼️ Carregar Imagem</button>
+              <button type="button" class="photo-btn btn-limpar" onclick="removerFoto()" style="background:linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">🗑️ Remover Foto</button>
+            </div>
+            <input type="file" id="fotoInput" accept="image/*" style="display:none;" onchange="processarFotoCarregada(this)">
+          </div>
+          
+          <div class="form-grid">
+            <div>
+              <label>Nome Completo:</label>
+              <input required id="usuarioNome" placeholder="Nome do usuário">
+            </div>
+            <div>
+              <label>Nome de Usuário:</label>
+              <input required id="usuarioLogin" placeholder="Login para acesso">
+            </div>
+            <div>
+              <label>Senha:</label>
+              <input type="password" required id="usuarioSenha" placeholder="Senha">
+            </div>
+            <div>
+              <label>Tipo de Usuário:</label>
+              <select id="usuarioTipo">
+                <option value="admin">Administrador</option>
+                <option value="vendedor">Vendedor</option>
+                <option value="estoque">Estoque</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" id="btnSalvarUsuario">💾 Cadastrar Usuário</button>
+            <button type="button" class="btn-limpar" onclick="limparFormUsuario()">🗑️ Limpar</button>
+            <button type="button" class="btn-limpar" onclick="cancelarEdicaoUsuario()" id="btnCancelarEdicaoUsuario" style="display:none;">❌ Cancelar</button>
+          </div>
+        </form>
+      </details>
+    </section>
+
+    <!-- INFORMAÇÕES -->
+    <section id="secInformacoes" class="hidden">
+      <h2>ℹ️ Informações do Sistema</h2>
+      
+      <div class="dashboard-card">
+        <h3>❓ Sobre o Sistema</h3>
+        <p>O Sistema de Informação Gerencial <b>🥖 Sys Pão</b> para a <b>Padaria Pão Quentinho</b> foi desenvolvido para facilitar o controle e gestão do negócio, integrando informações de estoque, vendas e relatórios inteligentes.</p><br>
+        <p><strong>Nome:</strong> Sys Pão - Sistema de Gestão</p>
+        <p><strong>Versão:</strong> 1.0</p>
+        <p><strong>Desenvolvido por:</strong> Leandro Yata</p>
+        <p><strong>Data de Desenvolvimento:</strong> 2025</p>
+      </div>
+
+      <div class="dashboard-card">
+        <h3>📋 Resumo do Negócio</h3>
+        <p><strong>Empresa:</strong> Padaria Pão Quentinho</p>
+        <p><strong>Segmento:</strong> Panificação e confeitaria artesanal</p>
+        <p><strong>Produtos:</strong> Pães, doces, salgados, bolos, café e encomendas especiais</p>
+        <p><strong>Tamanho:</strong> Pequena empresa (<20 funcionários)</p>
+      </div>
+
+      <div class="dashboard-card">
+        <h3>🔧 Funcionalidades</h3>
+        <ul>
+          <li>Controle completo de estoque</li>
+          <li>Registro de vendas e compras</li>
+          <li>Gestão de fornecedores</li>
+          <li>Gestão de clientes</li>
+          <li>Relatórios gerenciais</li>
+          <li>Dashboard com métricas</li>
+          <li>Exportação em PDF</li>
+          <li>Multi-usuário com diferentes níveis de acesso</li>
+        </ul>
+      </div>
+
+      <div class="dashboard-card">
+        <h3>✅ Problema Resolvido</h3>
+        <p>A padaria enfrentava dificuldades com controle manual e descentralizado do estoque, resultando em desperdícios, perdas e falta de produtos em horários de pico. Com este Sistema de Informação Gerencial (SIG) 🥖 Sys Pão, é possível registrar vendas e entradas de insumos, filtrar relatórios e identificar rapidamente o que precisa de atenção no estoque e desempenho dos produtos.</p>
+      </div>
+    </section>
+
+    <!-- Modal para visualizar foto -->
+    <div class="photo-modal" id="photoModal">
+      <span class="close-modal" onclick="fecharModal()">&times;</span>
+      <div class="photo-modal-content">
+        <img id="modalFoto" class="photo-modal-img" src="">
+      </div>
+    </div>
+
+    <!-- Modal para tirar foto -->
+    <div class="simple-modal" id="cameraModal">
+      <div class="simple-modal-content" style="max-width: 500px;">
+        <div class="simple-modal-header">
+          <h3>📸 Tirar Foto</h3>
+          <button class="close-simple-modal" onclick="fecharCamera()">&times;</button>
+        </div>
+        <div class="simple-modal-body">
+          <div id="cameraPreview" style="width: 100%; height: 300px; background: #000; margin-bottom: 15px;">
+            <video id="videoElement" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <canvas id="canvasElement" style="display:none;"></canvas>
+          </div>
+          <div class="simple-modal-buttons">
+            <button onclick="capturarFoto()">📷 Capturar</button>
+            <button class="btn-limpar" onclick="fecharCamera()">❌ Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal simples para adicionar fornecedor -->
+    <div class="simple-modal" id="fornecedorModal">
+      <div class="simple-modal-content">
+        <div class="simple-modal-header">
+          <h3>➕ Adicionar Fornecedor</h3>
+          <button class="close-simple-modal" onclick="fecharModalFornecedor()">&times;</button>
+        </div>
+        <div class="simple-modal-body">
+          <label>Nome do Fornecedor:</label>
+          <input type="text" id="novoFornecedorNome" placeholder="Digite o nome do fornecedor">
+          <div class="simple-modal-buttons">
+            <button onclick="salvarFornecedorRapido()">💾 Salvar</button>
+            <button class="btn-limpar" onclick="fecharModalFornecedor()">❌ Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal simples para adicionar cliente -->
+    <div class="simple-modal" id="clienteModal">
+      <div class="simple-modal-content">
+        <div class="simple-modal-header">
+          <h3>➕ Adicionar Cliente</h3>
+          <button class="close-simple-modal" onclick="fecharModalCliente()">&times;</button>
+        </div>
+        <div class="simple-modal-body">
+          <label>Nome do Cliente:</label>
+          <input type="text" id="novoClienteNome" placeholder="Digite o nome do cliente">
+          <div class="simple-modal-buttons">
+            <button onclick="salvarClienteRapido()">💾 Salvar</button>
+            <button class="btn-limpar" onclick="fecharModalCliente()">❌ Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    PADARIA PÃO QUENTINHO<br>
+    💻 Desenvolvido por Leandro Yata - 2025 | <span id="footerDataHora"></span>
+  </footer>
+
+  <!-- jsPDF e Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
