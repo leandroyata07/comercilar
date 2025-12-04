@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>OAuth Callback</title></head><body>
+<script>
+// This page receives the OAuth redirect and posts the query params to the opener window.
+(function(){
+  function parseQuery(q) {
+    const params = {};
+    q.replace(/^\?/, '').split('&').forEach(p => { if (!p) return; const [k,v] = p.split('='); params[decodeURIComponent(k)] = decodeURIComponent(v || ''); });
+    return params;
+  }
+  const params = parseQuery(window.location.search || '');
+  const hash = (window.location.hash || '').replace(/^#/, '');
+  const hashParams = {};
+  if (hash) hash.split('&').forEach(p => { const [k,v] = p.split('='); hashParams[decodeURIComponent(k)] = decodeURIComponent(v || ''); });
+  const data = Object.assign({}, params, hashParams);
+  try {
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage({ type: 'oauth_callback', data: data }, '*');
+      // close after a small delay
+      setTimeout(() => window.close(), 300);
+    } else {
+      document.body.innerHTML = '<p>Nenhuma janela originadora encontrada. Pode fechar esta aba.</p><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+    }
+  } catch (e) {
+    document.body.innerHTML = '<p>Erro ao comunicar com a janela originadora.</p>' + e.toString();
+  }
+})();
+</script>
+</body></html>
