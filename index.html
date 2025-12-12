@@ -2,13 +2,17 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Comerciar - Sistema de Gestão Comercial</title>
+  <title>ComerciLar - Sistema de Gestão Comercial</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header>
-    🛒 Comerciar - Sistema de Gestão Comercial
+    🛒 ComerciLar - Sistema de Gestão Comercial
   </header>
 
   <!-- Tela de Login -->
@@ -119,7 +123,7 @@
       
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
         <button class="btn-lista" onclick="toggleListaEstoque()" id="btnVerLista" aria-expanded="false" aria-controls="listaEstoqueContainer">📋 Ver Lista</button>
-        <button class="export-btn" onclick="exportTableAsPDF('tabelaEstoque', 'Estoque_Comerciar.pdf')">📄 Exportar PDF</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaEstoque', 'Estoque_ComerciLar.pdf')">📄 Exportar PDF</button>
       </div>
 
       <div id="listaEstoqueContainer" class="hidden collapsible">
@@ -506,7 +510,7 @@
       
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
         <button class="btn-lista" onclick="toggleListaFornecedores()" id="btnVerListaFornecedores" aria-expanded="false" aria-controls="listaFornecedoresContainer">📋 Ver Lista</button>
-        <button class="export-btn" onclick="exportTableAsPDF('tabelaFornecedores', 'Fornecedores_Comerciar.pdf')">📄 Exportar PDF</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaFornecedores', 'Fornecedores_ComerciLar.pdf')">📄 Exportar PDF</button>
       </div>
 
       <div id="listaFornecedoresContainer" class="hidden collapsible">
@@ -577,7 +581,7 @@
       
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
         <button class="btn-lista" onclick="toggleListaClientes()" id="btnVerListaClientes" aria-expanded="false" aria-controls="listaClientesContainer">📋 Ver Lista</button>
-        <button class="export-btn" onclick="exportTableAsPDF('tabelaClientes', 'Clientes_Comerciar.pdf')">📄 Exportar PDF</button>
+        <button class="export-btn" onclick="exportTableAsPDF('tabelaClientes', 'Clientes_ComerciLar.pdf')">📄 Exportar PDF</button>
       </div>
 
       <div id="listaClientesContainer" class="hidden collapsible">
@@ -904,8 +908,8 @@
       
       <div class="dashboard-card">
         <h3>❓ Sobre o Sistema</h3>
-        <p>O Sistema de Informação Gerencial <b>Comerciar</b> foi desenvolvido para atender comércios de diversos segmentos — desde lojas físicas até pequenos mercados e estabelecimentos comerciais —, facilitando o controle de estoque, gerenciamento de vendas e geração de relatórios gerenciais e fiscais.</p><br>
-        <p><strong>Nome:</strong> Comerciar - Sistema de Gestão Comercial</p>
+        <p>O Sistema de Informação Gerencial <b>ComerciLar</b> foi desenvolvido para atender comércios de diversos segmentos — desde lojas físicas até pequenos mercados e estabelecimentos comerciais —, facilitando o controle de estoque, gerenciamento de vendas e geração de relatórios gerenciais e fiscais.</p><br>
+        <p><strong>Nome:</strong> ComerciLar - Sistema de Gestão Comercial</p>
         <p><strong>Objetivo:</strong> Oferecer uma solução completa e intuitiva para gestão de operações comerciais, incluindo controle de estoque, registro de vendas, gerenciamento de fornecedores e geração de relatórios para tomada de decisão.</p>
         <p><strong>Versão:</strong> 1.0</p>
         <p><strong>Desenvolvido por:</strong> Leandro Yata</p>
@@ -1107,7 +1111,7 @@
   </div>
 
   <footer>
-    <div class="footer-left">🛒 Comerciar | <span id="footerDataHora"></span></div>
+    <div class="footer-left">Leandro Yata 2025 | <span id="footerDataHora"></span></div>
     <div class="footer-right">Usuário: <span id="footerUsuario">—</span></div>
   </footer>
 
