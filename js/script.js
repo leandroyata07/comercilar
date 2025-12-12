@@ -1,4 +1,4 @@
-// script.js - Comerciar - Sistema de Gestão Comercial
+// script.js - ComerciLar - Sistema de Gestão Comercial
 // Desenvolvido por Leandro Yata - 2025
 
 // ========== VARIÁVEIS GLOBAIS ==========
@@ -4054,7 +4054,7 @@ function exportRelatorioExcel() {
     
     // Dados do cabeçalho
     const headerData = [
-        ['Comerciar - Sistema de Gestão Comercial'],
+        ['ComerciLar - Sistema de Gestão Comercial'],
         [`Relatório: ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`],
         [`Data/Hora: ${dataHora}`],
         [`Usuário: ${usuario}`],
@@ -4319,8 +4319,8 @@ function gerarCabecalhoPDF(doc, titulo, dataHora, usuario, margin = 10) {
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
     doc.setTextColor(80, 80, 80);
-    doc.text('Comerciar', margin, margin + bannerH + 6);
-    doc.text('Comerciar - Sistema de Gestão Comercial', margin, margin + bannerH + 12);
+    doc.text('ComerciLar', margin, margin + bannerH + 6);
+    doc.text('ComerciLar - Sistema de Gestão Comercial', margin, margin + bannerH + 12);
     doc.text(`Data/Hora: ${dataHora}`, margin + contentWidth, margin + bannerH + 6, { align: 'right' });
     doc.text(`Usuário: ${usuario}`, margin + contentWidth, margin + bannerH + 12, { align: 'right' });
 
@@ -4734,7 +4734,7 @@ function renderizarFerramentas() {
 
 function backupDatabase() {
     const keys = ['estoque','vendas','compras','fornecedores','clientes','usuarios','despesas','relatoriosSalvos','undoStack'];
-    const payload = { meta: { app: 'Comerciar', createdAt: new Date().toISOString(), version: '1.0' }, data: {} };
+    const payload = { meta: { app: 'ComerciLar', createdAt: new Date().toISOString(), version: '1.0' }, data: {} };
     keys.forEach(k => { payload.data[k] = JSON.parse(localStorage.getItem(k) || 'null'); });
     // incluir algumas chaves de estado úteis
     payload.meta.theme = localStorage.getItem('theme') || 'default';
@@ -4891,7 +4891,7 @@ function applyTheme(name) {
 function prepareBackupForCloud(provider) {
     // gera backup e inicia download, então abre a página do provedor para facilitar upload manual
     const keys = ['estoque','vendas','compras','fornecedores','clientes','usuarios','despesas','relatoriosSalvos'];
-    const payload = { meta: { app: 'Comerciar', createdAt: new Date().toISOString() }, data: {} };
+    const payload = { meta: { app: 'ComerciLar', createdAt: new Date().toISOString() }, data: {} };
     keys.forEach(k => { payload.data[k] = JSON.parse(localStorage.getItem(k) || 'null'); });
     const filename = `comerciar_backup_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
     downloadObjectAsJsonFile(payload, filename);
@@ -5036,7 +5036,7 @@ async function exchangeCodeForToken(provider, code, codeVerifier, clientId, redi
 async function uploadBackupToCloud(provider) {
     showToolsStatus('Preparando backup...');
     const keys = ['estoque','vendas','compras','fornecedores','clientes','usuarios','despesas','relatoriosSalvos','undoStack'];
-    const payload = { meta: { app: 'Comerciar', createdAt: new Date().toISOString(), version: '1.0' }, data: {} };
+    const payload = { meta: { app: 'ComerciLar', createdAt: new Date().toISOString(), version: '1.0' }, data: {} };
     keys.forEach(k => { payload.data[k] = JSON.parse(localStorage.getItem(k) || 'null'); });
     const filename = `comerciar_backup_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
